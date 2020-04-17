@@ -6,7 +6,8 @@ from collections import deque
 
 ## functions
 def findCamera():
-    cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture('3_goPoint.avi')
     if not cap.isOpened():
         print("Could not open camera")
         cap.open(0)
