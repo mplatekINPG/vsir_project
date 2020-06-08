@@ -14,6 +14,8 @@ class Circle:
         self.speed = 0
         self.directRadAv = 0
         self.directRad = collections.deque(maxlen=10)
+        self.hitX = 0;
+        self.hitY = 0;
 
 # =============================================================================
 # Find green circles in image
@@ -133,9 +135,37 @@ def calculateMove(buf):
             c.directRadAv = (sum(c.directRad) + len(c.directRad)*3.14 )/len(c.directRad) -3.14
             
             
+            
     
     return last
+
+def detectCollision(buf):
     
+    if(len(buf)<2):
+        return False, 0, 0, 0, 0, 0, 0, 0
+    
+    bufSize = len(buf);
+  
+    
+    for s in range(1, 300):
+        for i in range(0, bufSize):
+            mult = s/10;
+            if(buf[i].speed>10):
+                x1 = buf[i].x + math.sin(buf[i].directRadAv)*buf[i].speed*mult
+                y1 = buf[i].y + math.cos(buf[i].directRadAv)*buf[i].speed*mult
+                for j in range(0, bufSize):
+                    if(i != j):
+                        x2 = buf[j].x + math.sin(buf[j].directRadAv)*buf[j].speed*mult
+                        y2 = buf[j].y + math.cos(buf[j].directRadAv)*buf[j].speed*mult
+                        h = math.sqrt(((x1 - x2)**2) + ((y1 - y2)**2))
+                        if h < (buf[i].radius + buf[j].radius): 
+                            colx = (x1+x2)/2
+                            coly = (y1+y2)/2
+                            
+                            tangentAngle = math.atan2( x1-colx, y1-coly) - math.pi/2
+                            return True, colx, coly, x1,y1, x2,y2, tangentAngle
+                
+    return False, 0, 0, 0, 0, 0, 0, 0
 
 
 
@@ -143,7 +173,7 @@ def calculateMove(buf):
 
 #cap = cv2.VideoCapture("dev/video0")
 #cap = cv2.VideoCapture(0)
-cap = cv2.VideoCapture('test8.mp4')
+cap = cv2.VideoCapture('test9.mp4')
 if not cap.isOpened():
      print("Could not open camera")
      #cap.open("dev/video0")
@@ -156,7 +186,7 @@ frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))    
 fps = cap.get(5)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
-out = cv2.VideoWriter('output1.avi',fourcc, 60, (frame_width,frame_height)) 
+out = cv2.VideoWriter('output.avi',fourcc, 60, (frame_width,frame_height)) 
 
 #out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
 time.sleep(2.0)
@@ -179,6 +209,14 @@ while(True):
      frame = AddCicrlesToFrame(frame, detectBuf[-1])
      frame = addCicrleText(frame, detectBuf[-1])
      
+     
+     
+     
+     flag, x, y,x1,y1, x2, y2, angle = detectCollision(detectBuf[-1])
+     if(flag):
+         cv2.circle(frame, (round(x), round(y)), 5, (0, 0, 255), -1)
+         cv2.line(frame,(round(x1), round(y1)),(round( x1 + 500 * math.sin(angle)),round( y1 + 500 * math.cos(angle))),(255,0,255),3)
+         cv2.line(frame,(round(x2), round(y2)),(round( x2 + 500 * math.sin(angle-math.pi/2)),round( y2 + 500 * math.cos(angle-math.pi/2))),(255,0,255),3)
      
     
      detectBuf.append(circlesList)
