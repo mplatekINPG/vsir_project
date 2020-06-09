@@ -168,8 +168,10 @@ def detectCollision(buf):
 
 
 # =============================================================================
-# Source initialization
+# Main script, source initialization, while loop with processing
 # =============================================================================
+
+#Source initialization
 #cap = cv2.VideoCapture("dev/video0")
 #cap = cv2.VideoCapture(0)
 cap = cv2.VideoCapture('test9.mp4')
@@ -178,30 +180,23 @@ if not cap.isOpened():
      #cap.open("dev/video0")
      cap.open(0)
      
-# =============================================================================
-# Detected circles list initialization
-# =============================================================================
+#Detected circles list initialization
 detectBuf = collections.deque(maxlen=10)
      
-# =============================================================================
-# Video parameters reading
-# =============================================================================
+#Video parameters reading
 frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))    
 fps = cap.get(5)
 
-# =============================================================================
-# Result video file initialization
-# =============================================================================
+#Result video file initialization
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 out = cv2.VideoWriter('output.avi',fourcc, 60, (frame_width,frame_height)) 
-
 #out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc('M','J','P','G'), 10, (frame_width,frame_height))
+
+#Starting delay
 time.sleep(2.0)
      
-# =============================================================================
-# Main processing loop
-# =============================================================================
+#Main processing loop
 while(True):
      #capturing frames
      ret, frame = cap.read()
