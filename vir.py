@@ -177,7 +177,7 @@ def detectCollision(buf):
 #Source initialization
 #cap = cv2.VideoCapture("dev/video0")
 #cap = cv2.VideoCapture(0)
-cap = cv2.VideoCapture('test8.mp4')
+cap = cv2.VideoCapture('test9.mp4')
 if not cap.isOpened():
      print("Could not open camera")
      #cap.open("dev/video0")
@@ -198,7 +198,8 @@ out = cv2.VideoWriter('output.avi',fourcc, 60, (frame_width,frame_height))
 
 #Starting delay
 time.sleep(2.0)
-     
+frame_num = 0;
+start = time.time()     
 #Main processing loop
 while(True):
      #capturing frames
@@ -208,7 +209,7 @@ while(True):
      if frame is None:
          print("Invalid frame")
          break
-     
+     frame_num += 1
      #finding circles
      circlesList = FindGreenCircles(frame)
      #updating buffer
@@ -243,7 +244,10 @@ while(True):
      #finish when Q is pressed
      if cv2.waitKey(1) & 0xFF == ord("q"):
          break
-     
+
+end = time.time()
+fps = frame_num/(end-start)     
+print("Estimated FPS is " + str(fps) + " in " + str(end-start) + " seconds")
 cap.release()
 out.release()
 cv2.destroyAllWindows()
