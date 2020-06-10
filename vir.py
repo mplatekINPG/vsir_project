@@ -160,7 +160,10 @@ def detectCollision(buf):
                             colx = (x1+x2)/2
                             coly = (y1+y2)/2
                             
-                            tangentAngle = math.atan2( x1-colx, y1-coly) - math.pi/2
+                            tangentAngle = math.atan2( x1-colx, y1-coly) + math.pi/2
+                            if tangentAngle > math.pi: tangentAngle = tangentAngle - math.pi
+                            elif tangentAngle < -math.pi: tangentAngle = tangentAngle + math.pi
+                            
                             return True, colx, coly, x1,y1, x2,y2, tangentAngle
                 
     return False, 0, 0, 0, 0, 0, 0, 0
@@ -174,7 +177,7 @@ def detectCollision(buf):
 #Source initialization
 #cap = cv2.VideoCapture("dev/video0")
 #cap = cv2.VideoCapture(0)
-cap = cv2.VideoCapture('test9.mp4')
+cap = cv2.VideoCapture('test8.mp4')
 if not cap.isOpened():
      print("Could not open camera")
      #cap.open("dev/video0")
@@ -219,12 +222,17 @@ while(True):
      
      #calculate collision
      flag, x, y,x1,y1, x2, y2, angle = detectCollision(detectBuf[-1])
+     
      if(flag):
          #draw effects of collision
          cv2.circle(frame, (round(x), round(y)), 5, (0, 0, 255), -1)
-         cv2.line(frame,(round(x1), round(y1)),(round( x1 + 500 * math.sin(angle)),round( y1 + 500 * math.cos(angle))),(255,0,255),3)
-         cv2.line(frame,(round(x2), round(y2)),(round( x2 + 500 * math.sin(angle-math.pi/2)),round( y2 + 500 * math.cos(angle-math.pi/2))),(255,0,255),3)
-   
+         if (angle >= 0):
+             cv2.line(frame,(round(x1), round(y1)),(round( x1 - 500 * math.sin(angle)),round( y1 - 500 * math.cos(angle))),(255,0,255),3)
+             cv2.line(frame,(round(x2), round(y2)),(round( x2 + 500 * math.sin(angle-math.pi/2)),round( y2 + 500 * math.cos(angle-math.pi/2))),(255,0,255),3)
+         elif(angle < 0):
+             cv2.line(frame,(round(x1), round(y1)),(round( x1 - 500 * math.sin(angle)),round( y1 - 500 * math.cos(angle))),(255,0,255),3)
+             cv2.line(frame,(round(x2), round(y2)),(round( x2 - 500 * math.sin(angle-math.pi/2)),round( y2 - 500 * math.cos(angle-math.pi/2))),(255,0,255),3)
+         
      detectBuf.append(circlesList)
      
      #show final video frame
